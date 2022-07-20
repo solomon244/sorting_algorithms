@@ -35,4 +35,5 @@ void myquicksort(int *array, int left, int right, size_t size);
 void myswap(int *array, int firts, int second, int size);
 void quick_sort_hoare(int *array, size_t size);
 void myswapy(int *array, int i, int j);
+void merge_sort(int *prmArray, size_t prmSize);
 #endif
