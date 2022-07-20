@@ -1,83 +1,78 @@
 #include "sort.h"
-#include "string.h"
 
 /**
- * merge - merge two part of an array
- * @prmArray: array of int to sort
- * @prmStart: start of the array
- * @prmMiddle: middle of the array
- * @prmEnd: end of the array
- * Return: nothing void
+ * merge_sort - sorts an array with the Merge Sort algorithm
+ * @array: array of ints to sort
+ * @size: size of the array
  */
-void merge(int *prmArray, int prmStart, int prmMiddle, int prmEnd)
+void merge_sort(int *array, size_t size)
 {
-	int cLoop1, cLoop2, cLoop3, cLoop4 = 0;
-	int size1 = prmMiddle - prmStart + 1, size2 = prmEnd - prmMiddle;
-	int tmp1[4096], tmp2[4096];
-	int *tmp3 = malloc(sizeof(int) * (size1 + size2));
+	int *arr;
 
-	for (cLoop1 = 0, cLoop2 = 0; cLoop1 < size1 || cLoop2 < size2; cLoop1++, cLoop2++)
+	if (!array || size < 2)
+		return;
+
+	arr = malloc(sizeof(int) * size);
+
+	merge_recursion(arr, array, 0, size);
+	free(arr);
+}
+
+/**
+ * merge_recursion - recursive function that merge sorts an array
+ * @arr: copy array
+ * @array: array to merge sort
+ * @left: index of the left element
+ * @right: index of the right element
+ */
+void merge_recursion(int *arr, int *array, size_t left, size_t right)
+{
+	size_t middle;
+
+	if (right - left > 1)
 	{
-		tmp1[cLoop1] = prmArray[prmStart + cLoop1];
-		tmp2[cLoop2] = prmArray[prmMiddle + 1 + cLoop2];
+		middle = (right - left) / 2 + left;
+		merge_recursion(arr, array, left, middle);
+		merge_recursion(arr, array, middle, right);
+		merge_subarray(arr, array, left, middle, right);
+	}
+}
+
+/**
+ * merge_subarray - merges subarrays
+ * @arr: copy array
+ * @array: array to merge
+ * @left: index of the left element
+ * @middle: index of the middle element
+ * @right: index of the right element
+ */
+void merge_subarray(int *arr, int *array, size_t left,
+		size_t middle, size_t right)
+{
+	size_t i, j, k = 0;
+
+	printf("Merging...\n");
+	printf("[left]: ");
+	print_array(array + left, middle  - left);
+	printf("[right]: ");
+	print_array(array + middle, right - middle);
+
+	for (i = left, j = middle; i < middle && j < right; k++)
+	{
+		if (array[i] < array[j])
+			arr[k] = array[i++];
+		else
+			arr[k] = array[j++];
 	}
 
-	for (cLoop1 = cLoop2 = 0, cLoop3 = prmStart;
-	     cLoop1 < size1 && cLoop2 < size2; cLoop3++)
-		if (tmp1[cLoop1] <= tmp2[cLoop2])
-			prmArray[cLoop3] = tmp3[cLoop4++] = tmp1[cLoop1++];
-		else
-			prmArray[cLoop3] = tmp3[cLoop4++] = tmp2[cLoop2++];
+	while (i < middle)
+		arr[k++] = array[i++];
+	while (j < right)
+		arr[k++] = array[j++];
 
-	printf("Merging...\n[left]: ");
-	print_array(tmp1, size1);
-	printf("[right]: ");
-	print_array(tmp2, size2);
-
-	while (cLoop1 < size1)
-		prmArray[cLoop3++] = tmp3[cLoop4++] = tmp1[cLoop1++];
-
-	while (cLoop2 < size2)
-		prmArray[cLoop3++] = tmp3[cLoop4++] = tmp2[cLoop2++];
+	for (k = left, i = 0; k < right; k++)
+		array[k] = arr[i++];
 
 	printf("[Done]: ");
-	print_array(tmp3, size1 + size2);
-
-	free(tmp3);
-}
-
-/**
- * sort - sort the array then merge it recursively
- * @prmArray: array of int to sort
- * @prmStart: begin of the array
- * @prmEnd: end of the array
- * Return: nothing void
- */
-
-void sort(int *prmArray, int prmStart, int prmEnd)
-{
-	int middle;
-
-	if (prmStart < prmEnd)
-	{
-		middle = (prmStart + prmEnd - 1) / 2;
-		sort(prmArray, prmStart, middle);
-		sort(prmArray, middle + 1, prmEnd);
-		merge(prmArray, prmStart, middle, prmEnd);
-	}
-}
-
-/**
- * merge_sort - function that sorts an array of integers in ascending
- * order using the Merge sort algorithm
- * @prmArray: array of int to sort
- * @prmSize: size of the array
- * Return: nothing void
- */
-
-void merge_sort(int *prmArray, size_t prmSize)
-{
-	if (prmArray == NULL || prmSize < 2)
-		return;
-	sort(prmArray, 0, prmSize - 1);
+	print_array(array + left, right - left);
 }
